@@ -123,6 +123,10 @@ button.vid{cursor:pointer;font-family:inherit}
 .skipped{font-size:.85rem;color:var(--warn);font-weight:700}
 
 .finish{margin-top:22px;display:grid;gap:8px}
+.rpe{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.rpe button{font:inherit;font-weight:700;font-size:1.25rem;min-height:48px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.rpe button.on{background:var(--plate);border-color:var(--plate);color:#fff}
+.rpe-l{margin:8px 0 0;text-align:center;font-weight:600;min-height:1.4em}
 .big{width:100%;border:0;border-radius:var(--r);padding:16px;font-family:var(--font-display);font-weight:800;font-size:1.5rem;text-transform:uppercase;letter-spacing:.04em;background:var(--plate);color:var(--plate-ink)}
 .big[disabled]{background:var(--line);color:var(--muted);cursor:not-allowed}
 .ghost{width:100%;border:1px solid var(--line);border-radius:var(--r);padding:12px;background:var(--surface);font-weight:700}
@@ -440,9 +444,12 @@ function renderHoy(){
   html += `<div class="block-h"><h3>Ejercicios</h3><span>${senior?'Toca un círculo por cada serie':'Anota peso y repeticiones'}</span></div><div class="stack">`;
   plan.items.forEach((it,i)=>{ html += senior ? renderSeniorEx(it,i) : renderEx(it,i); });
   html += `</div>`;
-  const all = done===plan.items.length;
+  const all = done===plan.items.length, rpe = a.esfuerzo||null;
   html += `<div class="block-h"><h3>Al terminar</h3></div><p class="muted" style="margin:0">${esc(plan.cool)}</p>
-  <div class="finish"><button class="big" data-act="terminar" ${all?'':'disabled'}>${all?'Terminar sesión':`Faltan ${plan.items.length-done} ejercicios`}</button>
+  <div class="block-h"><h3>¿Qué tanto te costó?</h3><span>1 muy fácil · 10 máximo</span></div>
+  <div class="rpe">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-rpe="${n}" class="${rpe===n?'on':''}" aria-pressed="${rpe===n}">${n}</button>`).join('')}</div>
+  <p class="rpe-l">${rpe?esc(RPE[rpe]):''}</p>
+  <div class="finish"><button class="big" data-act="terminar" ${all&&rpe?'':'disabled'}>${!all?`Faltan ${plan.items.length-done} ejercicios`:rpe?'Terminar sesión':'Elige del 1 al 10 qué tanto te costó'}</button>
   ${!all?`<p class="muted" style="margin:0;font-size:.85rem;text-align:center">La sesión se cuenta cuando marcas todos los ejercicios. Si uno te molesta, usa "Hoy no lo hago".</p>`:''}</div>`;
   return html;
 }
@@ -493,6 +500,7 @@ function renderSeniorEx(it,i){
     <button class="link-btn" data-skip="${it.id}">${e.skip?'Sí lo vamos a hacer':'Hoy no'}</button></div>
   </article>`;
 }
+const RPE = {1:'Muy, muy fácil',2:'Muy fácil',3:'Fácil',4:'Moderado',5:'Algo duro',6:'Duro',7:'Muy duro',8:'Muy, muy duro',9:'Casi al máximo',10:'Al máximo, no podía más'};
 const BANDS = {roja:'Roja · 10-50 lb',azul:'Azul · 25-80 lb',verde:'Verde · 50-120 lb'};
 function bandName(b){ return BANDS[b] ? BANDS[b].split(' ·')[0] : ''; }
 
@@ -514,8 +522,10 @@ function renderAvance(){
   } else if(!PEOPLE[S.perfil].senior){
     html += `<p class="muted">Cuando termines tu primera sesión con pesos anotados, aquí vas a ver cómo sube cada ejercicio.</p>`;
   }
+  const rp = h.filter(x=>x.esfuerzo).slice(-6).map(x=>x.esfuerzo);
+  if(rp.length) html += `<div class="block-h"><h3>Qué tanto costó</h3><span>últimas sesiones</span></div><p style="margin:0">${rp.join(' · ')} <span class="muted">(promedio ${(rp.reduce((x,y)=>x+y,0)/rp.length).toFixed(1)})</span></p>`;
   if(h.length){
-    html += `<div class="block-h"><h3>Sesiones</h3></div><div class="hist">${h.slice().reverse().slice(0,30).map(s=>`<div><span>${s.dia?'Día '+s.dia:'Sesión '+(s.n+1)} · semana ${Math.floor(s.n/3)+1}</span><span class="muted">${fmtDate(s.fecha)}</span></div>`).join('')}</div>`;
+    html += `<div class="block-h"><h3>Sesiones</h3></div><div class="hist">${h.slice().reverse().slice(0,30).map(s=>`<div><span>${s.dia?'Día '+s.dia:'Sesión '+(s.n+1)} · semana ${Math.floor(s.n/3)+1}</span><span class="muted">${s.esfuerzo?`Costó ${s.esfuerzo}/10 · `:''}${fmtDate(s.fecha)}</span></div>`).join('')}</div>`;
   }
   return html;
 }
@@ -597,12 +607,13 @@ document.addEventListener('click',ev=>{
     const e = exState(it.id,it.sets); e.skip = !e.skip; save();
     const y = window.scrollY; render(); window.scrollTo(0,y); return;
   }
+  if(t.dataset.rpe){ current().esfuerzo = +t.dataset.rpe; save(); const y = window.scrollY; render(); window.scrollTo(0,y); return; }
   if(t.id==='restSkip'){ stopRest(); return; }
   const act = t.dataset.act;
   if(act==='cambiar'){ S.perfil = null; save(); stopRest(); render(); window.scrollTo(0,0); }
   if(act==='terminar'){
     const p = P(), a = current(), plan = planFor(S.perfil,p.hechas);
-    p.historial.push({n:a.n,dia:plan.d,fecha:new Date().toISOString(),ex:a.ex});
+    p.historial.push({n:a.n,dia:plan.d,fecha:new Date().toISOString(),ex:a.ex,esfuerzo:a.esfuerzo||null});
     p.hechas += 1; p.actual = null; save(); stopRest();
     showModal(`<h2 style="font-size:2rem">¡Sesión completada!</h2><p style="margin:0">Llevas <b>${p.hechas}</b> ${p.hechas===1?'sesión':'sesiones'}. La próxima vez te toca ${PEOPLE[S.perfil].senior?'la sesión '+(p.hechas+1):'el día '+DAYS[p.hechas%3]}.</p><button class="big" data-act="cerrar">Listo</button>`);
     render(); window.scrollTo(0,0);
