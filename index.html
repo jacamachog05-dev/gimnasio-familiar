@@ -351,7 +351,23 @@ function planFor(person,n){
 /* ---------- Estado (se guarda en este celular) ---------- */
 const KEY = 'gimnasio-familiar-v1';
 let S = load();
-function blank(){ return {perfil:null,tab:'hoy',personas:{}}; }
+function blank(){ return {perfil:null,tab:'hoy',personas:{},pendientes:[]}; }
+// Panel del entrenador: cada sesión terminada se manda a la Hoja de Google de Luis.
+const COACH_URL = '';
+function coachPayload(person,ses){
+  const series = [];
+  Object.entries(ses.ex||{}).forEach(([id,e])=>{ if(!EX[id]||e.skip) return; e.sets.forEach((x,k)=>{ if(x.ok) series.push({ejercicio:EX[id].n,serie:k+1,peso:x.peso,reps:x.reps,banda:e.band?bandName(e.band):''}); }); });
+  const ex = Object.entries(ses.ex||{}).filter(([id])=>EX[id]);
+  return {persona:PEOPLE[person].name,sesion:ses.n+1,dia:ses.dia||'',semana:Math.floor(ses.n/3)+1,fecha:ses.fecha,esfuerzo:ses.esfuerzo||'',
+    hechos:ex.filter(([,e])=>!e.skip).length,saltados:ex.filter(([,e])=>e.skip).map(([id])=>EX[id].n).join(', '),resumen:resumen(person,ses),series};
+}
+function flushCoach(){
+  if(!COACH_URL || !S.pendientes || !S.pendientes.length || !navigator.onLine) return;
+  const item = S.pendientes[0];
+  fetch(COACH_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(item)})
+    .then(()=>{ S.pendientes.shift(); save(); flushCoach(); }).catch(()=>{});
+}
+window.addEventListener('online',()=>flushCoach());
 function load(){ try{ const raw = localStorage.getItem(KEY); return raw ? Object.assign(blank(),JSON.parse(raw)) : blank(); }catch(e){ return blank(); } }
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 function P(id){ id = id||S.perfil; if(!S.personas[id]) S.personas[id] = {hechas:0,historial:[],actual:null,pruebas:[]}; return S.personas[id]; }
@@ -617,7 +633,9 @@ document.addEventListener('click',ev=>{
   if(act==='terminar'){
     const p = P(), a = current(), plan = planFor(S.perfil,p.hechas);
     p.historial.push({n:a.n,dia:plan.d,fecha:new Date().toISOString(),ex:a.ex,esfuerzo:a.esfuerzo||null});
-    p.hechas += 1; p.actual = null; save(); stopRest();
+    p.hechas += 1; p.actual = null;
+    if(COACH_URL){ (S.pendientes = S.pendientes||[]).push(coachPayload(S.perfil,p.historial[p.historial.length-1])); }
+    save(); stopRest(); flushCoach();
     showModal(`<h2 style="font-size:2rem">¡Sesión completada!</h2><p style="margin:0">Llevas <b>${p.hechas}</b> ${p.hechas===1?'sesión':'sesiones'}. La próxima vez te toca ${PEOPLE[S.perfil].senior?'la sesión '+(p.hechas+1):'el día '+DAYS[p.hechas%3]}.</p><a class="big wa" href="${waLink(S.perfil,p.historial[p.historial.length-1])}" target="_blank" rel="noopener">Mandar resumen a Luis por WhatsApp</a><button class="ghost" data-act="cerrar">Listo</button>`);
     render(); window.scrollTo(0,0);
   }
@@ -683,6 +701,7 @@ function openSettings(){
   <button class="big" data-act="cerrar">Cerrar</button>`);
 }
 render();
+flushCoach();
 </script>
 
 </body>
