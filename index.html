@@ -123,6 +123,8 @@ button.vid{cursor:pointer;font-family:inherit}
 .skipped{font-size:.85rem;color:var(--warn);font-weight:700}
 
 .finish{margin-top:22px;display:grid;gap:8px}
+a.big{display:block;text-align:center;text-decoration:none}
+.box .ghost{width:100%}
 .rpe{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
 .rpe button{font:inherit;font-weight:700;font-size:1.25rem;min-height:48px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .rpe button.on{background:var(--plate);border-color:var(--plate);color:#fff}
@@ -233,8 +235,7 @@ const EX = {
   facepull:{n:'Face pull con banda larga',v:YT('shorts/qohLuTab1uE'),t:'banda',how:'Banda larga (Serious Steel) anclada a la altura de la cara. Jala hacia la cara con los codos altos y abre las manos.',why:'Hombros sanos y postura derecha.'},
   pallof:{n:'Pallof press',v:YT('shorts/KRBZd4UIaao'),t:'banda',how:'Banda larga (Serious Steel) anclada a un lado a la altura del pecho. Empuja las manos al frente y sostén 2 segundos sin dejar que el cuerpo gire.',why:'McGill. Entrena al abdomen a resistir giros, que es como se lastima la espalda en la vida diaria.'},
   piso:{n:'Levantarse del piso',v:YT('shorts/AFuSc06eAPY'),t:'reps',how:'Siéntate en el piso y levántate con la menor ayuda posible de manos y rodillas.',why:'Starrett + Attia. La prueba de sentarse y levantarse del piso predice cuántos años se vive. Es jugar en el piso con los nietos.'},
-  sq_banda:{n:'Sentadilla goblet con banda larga',v:YT('shorts/OdXLo6c0fkw'),t:'pb',how:'Pisa la banda larga (Serious Steel) con los dos pies y pásala por detrás de los hombros. Mancuerna al pecho. Baja controlado y sube fuerte: la banda pesa más arriba.',why:'Suma carga a la sentadilla cuando las 30 lb ya no alcanzan. Para el hueso hace falta peso pesado (Beck).'},
-  pmr_banda:{n:'Peso muerto rumano con banda larga',v:YT('shorts/yYBTJiLpYLQ'),t:'pb',how:'Pisa la banda larga (Serious Steel) con los dos pies y agárrala junto con las mancuernas. Bisagra de cadera con la espalda recta.',why:'Suma carga al peso muerto rumano cuando las mancuernas se quedan cortas.'},
+  sq_banda:{n:'Sentadilla goblet con banda de tela',v:YT('watch?v=f1lwriypX_8'),t:'pb',tela:true,how:'Banda de tela (corta) arriba de las rodillas y mancuerna pegada al pecho. Baja en 3 segundos empujando las rodillas hacia afuera contra la banda, pausa 1 segundo abajo y sube fuerte.',why:'La banda enseña a que la rodilla no se vaya hacia adentro, que es lo que más cuida el ligamento cruzado. La bajada lenta y la pausa hacen que 30 lb pesen como más.'},
   // Extras mamá
   cuna_goblet:{n:'Sentadilla en cuña con mancuerna',v:YT('shorts/-lcnU9SIhwA'),t:'peso',how:'Talones en las cuñas, mancuerna al pecho. Baja en 3 segundos y sube.',why:'Ben Patrick. Una de las mejores herramientas para la rodilla después de una cirugía de ligamento cruzado.'},
   curl_pelota:{n:'Curl de isquiotibiales con pelota',v:YT('shorts/wNxHyR54WBk'),t:'reps',how:'Acostada, talones sobre la pelota. Sube la cadera y jala la pelota hacia los glúteos.',why:'Isquiotibiales fuertes, los que protegen el ligamento cruzado.'},
@@ -249,7 +250,7 @@ const EX = {
   bodysaw:{n:'Body saw con TRX',v:YT('shorts/jHhOEY1o5ZM'),t:'ck',how:'Plancha en antebrazos con los pies en el TRX. Muévete adelante y atrás sin que la cadera se caiga.',why:'Abdomen fuerte sin doblar la espalda.'},
   cuerda:{n:'Saltar la cuerda',v:YT('shorts/T5U2duFj_wQ'),t:'ck',how:'Saltos bajos y rápidos sobre las puntas. Sin cuerda, saltos laterales.',why:'Impacto para el hueso y agilidad.'},
   pmr1:{n:'Peso muerto rumano a una pierna',v:YT('shorts/VW2oPpj8oXA'),t:'peso',how:'Mancuerna en la mano contraria a la pierna de apoyo. Inclínate con la espalda recta mientras la otra pierna va hacia atrás.',why:'Isquiotibiales y glúteo, más equilibrio.'},
-  hipthrust:{n:'Hip thrust en el banco',v:YT('shorts/QqtLsnNthbA'),t:'pb',how:'Espalda alta apoyada en el banco, mancuerna en la cadera. Para más carga, pasa una banda larga (Serious Steel) sobre la cadera y engánchala en las patas del banco. Sube la cadera y aprieta arriba.',why:'El mejor ejercicio para glúteo.'},
+  hipthrust:{n:'Hip thrust en el banco',v:YT('shorts/QqtLsnNthbA'),t:'pb',tela:true,how:'Espalda alta apoyada en el banco, mancuerna en la cadera y banda de tela arriba de las rodillas, empujando hacia afuera. Sube la cadera y aprieta 1 segundo arriba. Cuando 15 sean fáciles, hazlo a una pierna.',why:'El mejor ejercicio para glúteo. A una pierna, las mismas 30 lb pesan el doble.'},
   curl_exc_trx:{n:'Curl excéntrico con TRX',v:YT('shorts/uCYGKOvcKs8'),t:'reps',how:'Talones en las asas del TRX, cadera arriba. Jala con las dos piernas y estira con una sola en 4-5 segundos. Si alguien te sujeta los tobillos, haz curl nórdico.',why:'Sustituye al curl nórdico (Ben Patrick): protege isquiotibiales y rodilla.'},
   plancha_lat_pierna:{n:'Plancha lateral con elevación de pierna',v:YT('shorts/oCCFAUHgqZ8'),t:'ck',how:'Plancha lateral en el codo y los pies; sube y baja la pierna de arriba.',why:'McGill. Abdomen lateral y glúteo medio.'},
   lagartijas:{n:'Lagartijas',v:YT('shorts/Qv8ARgpagGk'),t:'reps',how:'Cuerpo recto, codos a 45°. Pies en el banco si son fáciles.',why:'Empujar con el propio peso.'},
@@ -289,8 +290,8 @@ function buildParent(person, n){
   const w = Math.floor(n/3)+1, d = DAYS[n%3], st = parentStage(w);
   const S = st.sets, heavy = st.stage===3;
   const dayEx = {
-    A:[[person==='mama'&&heavy?'sq_banda':'goblet_banco',S,heavy?'6-8':'8-12',90,person==='mama'&&heavy?'Roja; Azul cuando 8 sean fáciles':''],['remo1',S,'10 por lado',60],['puente_banda',S,'12',60,'Morada; Celeste cuando 12 sean fáciles'],['press_pecho',S,'8-12',60],['pajaro',2,'6 por lado',30],['plancha_lat_rod',2,'4 × 10 s por lado',30],['equilibrio1',2,'30 s por lado',0]],
-    B:[[person==='mama'&&heavy?'pmr_banda':'pmr',S,heavy?'6-8':'8-12',90,person==='mama'&&heavy?'Roja; Azul cuando 8 sean fáciles':''],['jalon_banda',S,'12',60,'Roja'],['stepup',S,'8 por lado',60],['press_hombro',S,'8-12',60],['curlup',2,'5 × 8 s',30],['talones',2,'15',30],['granjero',3,'30 m',60]],
+    A:[[person==='mama'&&heavy?'sq_banda':'goblet_banco',S,heavy?'6-8':'8-12',90,person==='mama'&&heavy?'Morada; Celeste cuando 8 sean fáciles':''],['remo1',S,'10 por lado',60],['puente_banda',S,'12',60,'Morada; Celeste cuando 12 sean fáciles'],['press_pecho',S,'8-12',60],['pajaro',2,'6 por lado',30],['plancha_lat_rod',2,'4 × 10 s por lado',30],['equilibrio1',2,'30 s por lado',0]],
+    B:[['pmr',S,heavy?'6-8 · bajada en 3 s':'8-12',90],['jalon_banda',S,'12',60,'Roja'],['stepup',S,'8 por lado',60],['press_hombro',S,'8-12',60],['curlup',2,'5 × 8 s',30],['talones',2,'15',30],['granjero',3,'30 m',60]],
     C:[['atg',S,'8 por lado',90],['remo_trx',S,'10-12',60],['puente1',2,'8 por lado',60],['flex_incl',S,'10-12',60],['facepull',2,'15',30,'Roja'],['pallof',2,'10 por lado',30,'Roja'],['piso',1,'5',0]],
   }[d].slice();
   const notes = [];
@@ -316,13 +317,13 @@ function buildHermana(n){
   const w = Math.floor(n/3)+1, d = DAYS[n%3], cw = ((w-1)%5)+1, deload = cw===5;
   const k = x => deload ? Math.max(1,Math.ceil(x/2)) : x;
   const dayEx = {
-    A:[['salto_vertical',k(3),'5',60],['bulgara',k(4),'6-10 por lado',90],['press_pecho',k(4),'8-12 · bajada en 3 s',90],['sq_banda',k(3),'8-10',90,'Azul; Verde cuando 10 sean fáciles'],['press_hombro1',k(3),'8-10 por lado',60],['bodysaw',k(3),'30 s',45]],
-    B:[['cuerda',k(3),'30 s',45],['pmr1',k(4),'8 por lado',90],['remo1',k(4),'10-12 por lado · bajada lenta',60],['hipthrust',k(4),'10-15',60,'Opcional: larga Roja o Azul sobre la cadera'],['curl_exc_trx',k(3),'6 por lado',90],['jalon_banda',k(3),'12 por lado · a una mano',45,'Roja'],['plancha_lat_pierna',k(3),'20 s por lado',30]],
-    C:[['atg',k(4),'45 s',15],['lagartijas',k(4),'45 s',15],['pmr_banda',k(4),'45 s',15,'Roja o Azul'],['remo_trx',k(4),'45 s',15],['tibial',k(4),'45 s',15],['granjero',k(4),'45 s',15],['pallof',k(4),'45 s',90,'Roja']],
+    A:[['salto_vertical',k(3),'5',60],['bulgara',k(4),'6-10 por lado',90],['press_pecho',k(4),'8-12 · bajada en 3 s',90],['sq_banda',k(3),'8-10',90,'Celeste'],['press_hombro1',k(3),'8-10 por lado',60],['bodysaw',k(3),'30 s',45]],
+    B:[['cuerda',k(3),'30 s',45],['pmr1',k(4),'8 por lado',90],['remo1',k(4),'10-12 por lado · bajada lenta',60],['hipthrust',k(4),'10-15',60,'Celeste'],['curl_exc_trx',k(3),'6 por lado',90],['jalon_banda',k(3),'12 por lado · a una mano',45,'Roja'],['plancha_lat_pierna',k(3),'20 s por lado',30]],
+    C:[['atg',k(4),'45 s',15],['lagartijas',k(4),'45 s',15],['pmr',k(4),'45 s',15],['remo_trx',k(4),'45 s',15],['tibial',k(4),'45 s',15],['granjero',k(4),'45 s',15],['pallof',k(4),'45 s',90,'Roja']],
   }[d];
   const notes = [];
   if(d==='C') notes.push('<b>Circuito:</b> haz un ejercicio tras otro (45 s de trabajo, 15 s para cambiar). Al terminar la vuelta descansa 90 s y repite. Marca cada serie al terminar cada vuelta.');
-  notes.push('<b>Para progresar con 30 lb:</b> cada semana suma 1-2 repeticiones o 1 segundo a la bajada. En sentadilla, peso muerto y hip thrust, las bandas Serious Steel suman la carga que les falta a las mancuernas.');
+  notes.push('<b>Para progresar con 30 lb:</b> cada semana suma 1-2 repeticiones o 1 segundo a la bajada. Baja en 3 segundos y haz una pausa abajo: así 30 lb rinden mucho más. En hip thrust, pasa a una pierna cuando 15 sean fáciles.');
   const warm = ['atras','tibial','cunasq','lateral','pullapart','saltosuave'];
   const warmDose = {atras:'2 min',tibial:'20',cunasq:'10',lateral:'10 pasos por lado · tela celeste',pullapart:'15 · banda larga roja',saltosuave:'10'};
   return {w,d,stage:{label:deload?'Semana ligera · recuperar':'Ciclo de 5 semanas · semana '+cw,deload},rirText:'Termina cada serie con 1-2 repeticiones de sobra',warm,warmDose,items:dayEx.map(toItem),notes,total:null,
@@ -526,6 +527,7 @@ function renderAvance(){
   const rp = h.filter(x=>x.esfuerzo).slice(-6).map(x=>x.esfuerzo);
   if(rp.length) html += `<div class="block-h"><h3>Qué tanto costó</h3><span>últimas sesiones</span></div><p style="margin:0">${rp.join(' · ')} <span class="muted">(promedio ${(rp.reduce((x,y)=>x+y,0)/rp.length).toFixed(1)})</span></p>`;
   if(h.length){
+    html += `<a class="big wa" style="margin-top:16px" href="${waLink(S.perfil,h[h.length-1])}" target="_blank" rel="noopener">Mandar la última sesión a Luis</a>`;
     html += `<div class="block-h"><h3>Sesiones</h3></div><div class="hist">${h.slice().reverse().slice(0,30).map(s=>`<div><span>${s.dia?'Día '+s.dia:'Sesión '+(s.n+1)} · semana ${Math.floor(s.n/3)+1}</span><span class="muted">${s.esfuerzo?`Costó ${s.esfuerzo}/10 · `:''}${fmtDate(s.fecha)}</span></div>`).join('')}</div>`;
   }
   return html;
@@ -616,7 +618,7 @@ document.addEventListener('click',ev=>{
     const p = P(), a = current(), plan = planFor(S.perfil,p.hechas);
     p.historial.push({n:a.n,dia:plan.d,fecha:new Date().toISOString(),ex:a.ex,esfuerzo:a.esfuerzo||null});
     p.hechas += 1; p.actual = null; save(); stopRest();
-    showModal(`<h2 style="font-size:2rem">¡Sesión completada!</h2><p style="margin:0">Llevas <b>${p.hechas}</b> ${p.hechas===1?'sesión':'sesiones'}. La próxima vez te toca ${PEOPLE[S.perfil].senior?'la sesión '+(p.hechas+1):'el día '+DAYS[p.hechas%3]}.</p><button class="big" data-act="cerrar">Listo</button>`);
+    showModal(`<h2 style="font-size:2rem">¡Sesión completada!</h2><p style="margin:0">Llevas <b>${p.hechas}</b> ${p.hechas===1?'sesión':'sesiones'}. La próxima vez te toca ${PEOPLE[S.perfil].senior?'la sesión '+(p.hechas+1):'el día '+DAYS[p.hechas%3]}.</p><a class="big wa" href="${waLink(S.perfil,p.historial[p.historial.length-1])}" target="_blank" rel="noopener">Mandar resumen a Luis por WhatsApp</a><button class="ghost" data-act="cerrar">Listo</button>`);
     render(); window.scrollTo(0,0);
   }
   if(act==='cerrar'){ $('#modal').innerHTML=''; }
@@ -653,6 +655,19 @@ document.addEventListener('change',ev=>{
   if(el.dataset && el.dataset.band){ const plan = planFor(S.perfil,P().hechas), it = plan.items.find(x=>x.id===el.dataset.band); exState(it.id,it.sets).band = el.value; save(); }
   if(el.dataset && el.dataset.f){ const plan = planFor(S.perfil,P().hechas), it = plan.items.find(x=>x.id===el.dataset.id); exState(it.id,it.sets).sets[+el.dataset.k][el.dataset.f] = el.value.trim().replace(',','.'); save(); }
 });
+function resumen(person,ses){
+  const L = [`💪 ${PEOPLE[person].name} · ${ses.dia?'Día '+ses.dia:'Sesión '+(ses.n+1)} · semana ${Math.floor(ses.n/3)+1} · ${fmtDate(ses.fecha)}`];
+  if(ses.esfuerzo) L.push(`Esfuerzo: ${ses.esfuerzo}/10 (${RPE[ses.esfuerzo]})`);
+  Object.entries(ses.ex||{}).forEach(([id,e])=>{
+    if(!EX[id]) return;
+    if(e.skip){ L.push(`• ${EX[id].n}: no lo hizo`); return; }
+    const sets = e.sets.filter(x=>x.ok).map(x=>[x.peso!==''?x.peso+' lb':'',x.reps!==''?(x.peso!==''?'× ':'')+x.reps:''].filter(Boolean).join(' ')).filter(Boolean);
+    const n = e.sets.filter(x=>x.ok).length;
+    L.push(`• ${EX[id].n}: ${sets.length?sets.join(', '):n+' series'}${e.band?' · banda '+(EX[id].tela?'de tela ':'')+bandName(e.band).toLowerCase():''}`);
+  });
+  return L.join('\n');
+}
+function waLink(person,ses){ return 'https://wa.me/?text='+encodeURIComponent(resumen(person,ses)); }
 function showModal(inner){ $('#modal').innerHTML = `<div class="dialog" role="dialog" aria-modal="true"><div class="box">${inner}</div></div>`; }
 function openSettings(){
   const p = P();
