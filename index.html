@@ -233,6 +233,8 @@ const EX = {
   jalon_banda:{n:'Jalón con banda larga',v:YT('shorts/dDQm3vHnLNY'),t:'banda',how:'Banda larga (Serious Steel) anclada arriba, en el punto del TRX. Jala hacia el pecho con los codos hacia abajo.',why:'Espalda ancha y hombros sanos.'},
   stepup:{n:'Subida al escalón con mancuernas',v:YT('shorts/-RC2DHXV2yg'),t:'peso',how:'Sube al escalón o banco bajo empujando con la pierna de arriba, sin impulsarte con la de abajo. Baja despacio.',why:'Attia. Subir escaleras con bolsas a los 80. Fortalece cada pierna por separado.'},
   press_hombro:{n:'Press de hombro sentado',v:YT('shorts/g0VD63YKh6Q'),t:'peso',how:'Sentado con la espalda apoyada, sube las mancuernas por encima de la cabeza y bájalas a la altura de las orejas.',why:'Poder subir cosas a una repisa alta o cargar a un nieto.'},
+  curl_biceps:{n:'Curl de bíceps con mancuernas',v:YT('shorts/pr6KU_uqEkA'),t:'peso',how:'De pie, codos pegados al cuerpo. Sube girando la palma hacia arriba, aprieta 1 segundo y baja en 3 segundos. Sin balancear la espalda.',why:'Bíceps más grandes: la bajada lenta y llegar cerca del fallo es lo que más los hace crecer (Schoenfeld).'},
+  curl_martillo:{n:'Curl martillo',v:YT('shorts/NyW2fT2gQhM'),t:'peso',how:'Palmas mirándose, como agarrando un martillo. Sube sin mover los codos y baja despacio.',why:'Trabaja el braquial, el músculo que está debajo del bíceps y lo empuja hacia arriba: hace ver el brazo más grueso.'},
   curlup:{n:'Curl-up modificado de McGill',v:YT('shorts/JcNh2sxb5Z0'),t:'ck',how:'Acostado, una rodilla doblada, manos bajo la espalda baja. Levanta solo cabeza y hombros unos centímetros y sostén 8 segundos.',why:'McGill, uno de los "tres grandes". Abdomen fuerte sin doblar la espalda baja.'},
   talones:{n:'Elevación de talones con mancuernas',v:YT('shorts/8sT7Ne3Kzwc'),t:'peso',how:'De pie con mancuernas, sube a las puntas, sostén un segundo y baja despacio.',why:'Pantorrillas y tobillos fuertes; equilibrio al caminar.'},
   granjero:{n:'Paseo del granjero',v:YT('shorts/DBpZpTftNAE'),t:'peso',how:'Mancuernas pesadas a los lados, camina con pasos cortos y la espalda derecha.',why:'Dan John + Attia. La fuerza de agarre predice longevidad; es cargar las compras o a un nieto.'},
@@ -313,6 +315,8 @@ function buildParent(person, n, dd){
     if(w>=3) notes.push('<b>Saltos:</b> solo si la rodilla está bien y la densitometría no salió con osteoporosis. Si salió, quédate en los taconazos.');
   }
   if(person==='papa'){
+    if(d==='A') dayEx.push(['curl_biceps',st.deload?2:3,'8-12 · bajada en 3 s',60]);
+    if(d==='C') dayEx.push(['curl_martillo',st.deload?2:3,'10-15',60]);
     notes.push('<b>Espalda:</b> pájaro-perro, plancha lateral y curl-up no se saltan nunca. Si un día estás cansado, haz solo el calentamiento y esos tres.');
     notes.push('<b>Por tu estatura:</b> baja solo hasta donde la espalda siga recta. Si se redondea en la sentadilla, pon una cuña sobre el banco.');
   }
@@ -584,7 +588,7 @@ function streak(h){
 function fmtDate(iso){ try{ return new Date(iso).toLocaleDateString('es',{day:'numeric',month:'short'}); }catch(e){ return iso.slice(0,10); } }
 
 const RETOS = [
-  {id:'b21',para:['papa'],tag:'Bíceps',n:'21s del infierno',unidad:'reps',how:'Curl con las mancuernas de 15 lb: 7 de abajo hasta la mitad, 7 de la mitad hasta arriba y 7 completas, sin soltar. Eso es una ronda. Haz 3 rondas descansando 45 s. Anota cuántas repeticiones lograste en total sin trampa (máximo 63).'},
+  {id:'b21',para:['papa'],tag:'Bíceps',n:'Reto de los 21',unidad:'reps',how:'Curl con las mancuernas de 15 lb: 7 de abajo hasta la mitad, 7 de la mitad hasta arriba y 7 completas, sin soltar. Eso es una ronda. Haz 3 rondas descansando 45 s. Anota cuántas repeticiones lograste en total sin trampa (máximo 63).'},
   {id:'bdrop',para:['papa'],tag:'Bíceps',n:'Escalera de bíceps hasta el fallo',unidad:'reps',how:'Sin descansar entre pasos: curl con 30 lb hasta que no puedas más, luego curl martillo con 30 lb al fallo, luego curl con 15 lb al fallo y al final pisa la banda verde y curl al fallo. Anota el total de repeticiones.'},
   {id:'b100',para:['papa'],tag:'Bíceps',n:'100 curls con banda',unidad:'s',menos:true,how:'Pisa la banda azul con los dos pies. Haz 100 curls completos lo más rápido que puedas, descansando lo menos posible. Anota cuántos segundos tardaste (menos es mejor).'},
   {id:'biso',para:['papa'],tag:'Bíceps',n:'Curl congelado a 90°',unidad:'s',how:'Una mancuerna de 30 lb en cada mano, codos pegados al cuerpo y doblados a 90°. Aguanta sin bajar ni balancearte. Anota los segundos.'},
