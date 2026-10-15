@@ -352,7 +352,7 @@ function planFor(person,n){
 const KEY = 'gimnasio-familiar-v1';
 let S = load();
 function blank(){ return {perfil:null,tab:'hoy',personas:{},pendientes:[]}; }
-// Panel del entrenador: cada sesión terminada se manda a la Hoja de Google de Luis.
+// Panel del entrenador: cada sesión terminada se manda a la Hoja de Google de José.
 const COACH_URL = 'https://script.google.com/macros/s/AKfycbx7YdXrgVGplQxnySLJ6dwKp6qDWoKi6n3xvKqx1WfOwZsrV3mscS9HqB_Y0pve--hv/exec';
 function coachPayload(person,ses){
   const series = [];
@@ -444,7 +444,7 @@ function renderHoy(){
   let sessionTitle = senior ? `Sesión ${p.hechas+1}` : `Día ${plan.d}`;
   let html = '';
   if(plan.total && p.hechas>=plan.total){
-    html += `<div class="done-card"><h3>¡Terminaste las 12 semanas!</h3><p style="margin:0">Haz las pruebas en la pestaña Pruebas y avísale a Luis para preparar el siguiente plan. Mientras tanto, la app sigue con la etapa 3.</p></div>`;
+    html += `<div class="done-card"><h3>¡Terminaste las 12 semanas!</h3><p style="margin:0">Haz las pruebas en la pestaña Pruebas y avísale a José para preparar el siguiente plan. Mientras tanto, la app sigue con la etapa 3.</p></div>`;
   }
   html += `<section class="session">
     <span class="k">Semana ${plan.w}${plan.total?` de 12`:''} · ${senior?'':`sesión ${thisWeekDone+1} de 3`}</span>
@@ -543,7 +543,7 @@ function renderAvance(){
   const rp = h.filter(x=>x.esfuerzo).slice(-6).map(x=>x.esfuerzo);
   if(rp.length) html += `<div class="block-h"><h3>Qué tanto costó</h3><span>últimas sesiones</span></div><p style="margin:0">${rp.join(' · ')} <span class="muted">(promedio ${(rp.reduce((x,y)=>x+y,0)/rp.length).toFixed(1)})</span></p>`;
   if(h.length){
-    html += `<a class="big wa" style="margin-top:16px" href="${waLink(S.perfil,h[h.length-1])}" target="_blank" rel="noopener">Mandar la última sesión a Luis</a>`;
+    html += `<a class="big wa" style="margin-top:16px" href="${waLink(S.perfil,h[h.length-1])}" target="_blank" rel="noopener">Mandar la última sesión a José</a>`;
     html += `<div class="block-h"><h3>Sesiones</h3></div><div class="hist">${h.slice().reverse().slice(0,30).map(s=>`<div><span>${s.dia?'Día '+s.dia:'Sesión '+(s.n+1)} · semana ${Math.floor(s.n/3)+1}</span><span class="muted">${s.esfuerzo?`Costó ${s.esfuerzo}/10 · `:''}${fmtDate(s.fecha)}</span></div>`).join('')}</div>`;
   }
   return html;
@@ -636,7 +636,7 @@ document.addEventListener('click',ev=>{
     p.hechas += 1; p.actual = null;
     if(COACH_URL){ (S.pendientes = S.pendientes||[]).push(coachPayload(S.perfil,p.historial[p.historial.length-1])); }
     save(); stopRest(); flushCoach();
-    showModal(`<h2 style="font-size:2rem">¡Sesión completada!</h2><p style="margin:0">Llevas <b>${p.hechas}</b> ${p.hechas===1?'sesión':'sesiones'}. La próxima vez te toca ${PEOPLE[S.perfil].senior?'la sesión '+(p.hechas+1):'el día '+DAYS[p.hechas%3]}.</p><a class="big wa" href="${waLink(S.perfil,p.historial[p.historial.length-1])}" target="_blank" rel="noopener">Mandar resumen a Luis por WhatsApp</a><button class="ghost" data-act="cerrar">Listo</button>`);
+    showModal(`<h2 style="font-size:2rem">¡Sesión completada!</h2><p style="margin:0">Llevas <b>${p.hechas}</b> ${p.hechas===1?'sesión':'sesiones'}. La próxima vez te toca ${PEOPLE[S.perfil].senior?'la sesión '+(p.hechas+1):'el día '+DAYS[p.hechas%3]}.</p><a class="big wa" href="${waLink(S.perfil,p.historial[p.historial.length-1])}" target="_blank" rel="noopener">Mandar resumen a José por WhatsApp</a><button class="ghost" data-act="cerrar">Listo</button>`);
     render(); window.scrollTo(0,0);
   }
   if(act==='cerrar'){ $('#modal').innerHTML=''; }
@@ -702,7 +702,7 @@ function openSettings(){
   <textarea id="rs" placeholder="Pega aquí el respaldo"></textarea>
   <p id="rsMsg" style="margin:0;color:var(--warn)"></p>
   <button class="ghost" data-act="restaurar">Restaurar</button>
-  <button class="ghost" data-act="probar-coach">Probar conexión con Luis</button>
+  <button class="ghost" data-act="probar-coach">Probar conexión con José</button>
   ${p.hechas>0?`<button class="ghost" data-act="atras-sesion">Deshacer la última sesión (${p.hechas})</button>`:''}
   <button class="big" data-act="cerrar">Cerrar</button>`);
 }
