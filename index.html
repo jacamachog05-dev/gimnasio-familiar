@@ -123,6 +123,9 @@ button.vid{cursor:pointer;font-family:inherit}
 .skipped{font-size:.85rem;color:var(--warn);font-weight:700}
 
 .finish{margin-top:22px;display:grid;gap:8px}
+.crono-pill{position:sticky;top:8px;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;padding:8px 14px;border-radius:99px;background:var(--ink);color:var(--bg);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.crono-pill span{font-weight:700;font-size:.9rem}
+.crono-pill b{font-family:var(--font-display);font-size:1.5rem;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .daypick{display:grid;gap:8px}
 .daypick button{display:grid;gap:2px;text-align:left;font:inherit;padding:10px 14px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .daypick button b{font-family:var(--font-display);font-size:1.3rem;text-transform:uppercase}
@@ -360,7 +363,9 @@ function planFor(person,n,dd){
   return buildParent(person,n,dd);
 }
 // Plan de la sesión de hoy, con el día que escogió la persona (A, B o C).
-function planNow(){ return planFor(S.perfil,P().hechas,current().dia); }
+function planNow(){ return planFor(S.perfil,P().hechas,current().dia||nextDay(P())); }
+// El día que toca es el siguiente al último que hizo (A → B → C → A), aunque haya escogido otro.
+function nextDay(p){ const last = [...p.historial].reverse().find(x=>x.dia); return last ? DAYS[(DAYS.indexOf(last.dia)+1)%3] : DAYS[p.hechas%3]; }
 
 /* ---------- Estado (se guarda en este celular) ---------- */
 const KEY = 'gimnasio-familiar-v1';
@@ -460,6 +465,7 @@ function renderHoy(){
   if(plan.total && p.hechas>=plan.total){
     html += `<div class="done-card"><h3>¡Terminaste las 12 semanas!</h3><p style="margin:0">Haz las pruebas en la pestaña Pruebas y avísale a José para preparar el siguiente plan. Mientras tanto, la app sigue con la etapa 3.</p></div>`;
   }
+  if(a.inicio) html += `<div class="crono-pill" role="timer" aria-live="off"><span>⏱ Entrenando</span><b id="crono">${fmtDur(Date.now()-new Date(a.inicio).getTime())}</b></div>`;
   html += `<section class="session">
     <span class="k">Semana ${plan.w}${plan.total?` de 12`:''} · ${senior?'':`sesión ${thisWeekDone+1} de 3`}</span>
     <h2>${sessionTitle}</h2>
@@ -467,13 +473,14 @@ function renderHoy(){
     <div class="bar" aria-label="Avance de la sesión"><i style="width:${pct}%"></i></div>
     <span class="k">${done} de ${plan.items.length} ejercicios · ${p.hechas} sesiones completadas${plan.total?` de ${plan.total}`:''}</span>
   </section>`;
-  if(!senior){
-    const sug = DAYS[p.hechas%3];
+  if(!senior && !a.inicio){
+    const sug = nextDay(p);
     html += `<div class="block-h"><h3>¿Qué día quieres hacer?</h3><span>Te toca el ${sug}</span></div><div class="daypick">${DAYS.map(d=>{
       const pl = planFor(per,p.hechas,d);
       return `<button data-day="${d}" class="${plan.d===d?'on':''}" aria-pressed="${plan.d===d}"><b>Día ${d}${d===sug?' · te toca':''}</b><small>${pl.items.slice(0,3).map(it=>esc(EX[it.id].n)).join(' · ')}</small></button>`;
     }).join('')}</div>`;
   }
+  if(!a.inicio) html += `<div class="finish" style="margin-top:14px"><button class="big" data-act="empezar">▶ Empezar entrenamiento</button><p class="muted" style="margin:0;font-size:.85rem;text-align:center">Empieza a contar el tiempo. Al terminar, se guarda cuánto duraste.</p></div>`;
   if(plan.notes.length) html += `<div class="stack" style="margin-top:12px">${plan.notes.map(n=>`<div class="note">${n}</div>`).join('')}</div>`;
   // Calentamiento
   html += `<div class="block-h"><h3>Calentamiento</h3><span>${senior?'5 min':'7-10 min'}</span></div><div class="warm">${plan.warm.map(id=>`
@@ -565,7 +572,7 @@ function renderAvance(){
   if(rp.length) html += `<div class="block-h"><h3>Qué tanto costó</h3><span>últimas sesiones</span></div><p style="margin:0">${rp.join(' · ')} <span class="muted">(promedio ${(rp.reduce((x,y)=>x+y,0)/rp.length).toFixed(1)})</span></p>`;
   if(h.length){
     html += `<a class="big wa" style="margin-top:16px" href="${waLink(S.perfil,h[h.length-1])}" target="_blank" rel="noopener">Mandar la última sesión a José</a>`;
-    html += `<div class="block-h"><h3>Sesiones</h3></div><div class="hist">${h.slice().reverse().slice(0,30).map(s=>`<div><span>${s.dia?'Día '+s.dia:'Sesión '+(s.n+1)} · semana ${Math.floor(s.n/3)+1}</span><span class="muted">${s.esfuerzo?`Costó ${s.esfuerzo}/10 · `:''}${fmtDate(s.fecha)}</span></div>`).join('')}</div>`;
+    html += `<div class="block-h"><h3>Sesiones</h3></div><div class="hist">${h.slice().reverse().slice(0,30).map(s=>`<div><span>${s.dia?'Día '+s.dia:'Sesión '+(s.n+1)} · semana ${Math.floor(s.n/3)+1}</span><span class="muted">${s.duracion?`${s.duracion} min · `:''}${s.esfuerzo?`Costó ${s.esfuerzo}/10 · `:''}${fmtDate(s.fecha)}</span></div>`).join('')}</div>`;
   }
   return html;
 }
@@ -686,13 +693,15 @@ document.addEventListener('click',ev=>{
   if(t.id==='restSkip'){ stopRest(); return; }
   const act = t.dataset.act;
   if(act==='cambiar'){ S.perfil = null; save(); stopRest(); render(); window.scrollTo(0,0); }
+  if(act==='empezar'){ const a = current(); a.inicio = new Date().toISOString(); save(); keepAwake(); render(); window.scrollTo(0,0); }
   if(act==='terminar'){
     const p = P(), a = current(), plan = planNow();
-    p.historial.push({n:a.n,dia:plan.d,fecha:new Date().toISOString(),ex:a.ex,esfuerzo:a.esfuerzo||null});
+    const dur = a.inicio ? Math.max(1,Math.round((Date.now()-new Date(a.inicio).getTime())/60000)) : null;
+    p.historial.push({n:a.n,dia:plan.d,fecha:new Date().toISOString(),ex:a.ex,esfuerzo:a.esfuerzo||null,inicio:a.inicio||null,duracion:dur});
     p.hechas += 1; p.actual = null;
     if(COACH_URL){ (S.pendientes = S.pendientes||[]).push(coachPayload(S.perfil,p.historial[p.historial.length-1])); }
     save(); stopRest(); flushCoach();
-    showModal(`<h2 style="font-size:2rem">¡Sesión completada!</h2><p style="margin:0">Llevas <b>${p.hechas}</b> ${p.hechas===1?'sesión':'sesiones'}. La próxima vez te toca ${PEOPLE[S.perfil].senior?'la sesión '+(p.hechas+1):'el día '+DAYS[p.hechas%3]}.</p><a class="big wa" href="${waLink(S.perfil,p.historial[p.historial.length-1])}" target="_blank" rel="noopener">Mandar resumen a José por WhatsApp</a><button class="ghost" data-act="cerrar">Listo</button>`);
+    showModal(`<h2 style="font-size:2rem">¡Sesión completada!</h2><p style="margin:0">Llevas <b>${p.hechas}</b> ${p.hechas===1?'sesión':'sesiones'}. ${dur?`Entrenaste <b>${dur} min</b>. `:''}La próxima vez te toca ${PEOPLE[S.perfil].senior?'la sesión '+(p.hechas+1):'el día '+nextDay(p)}.</p><a class="big wa" href="${waLink(S.perfil,p.historial[p.historial.length-1])}" target="_blank" rel="noopener">Mandar resumen a José por WhatsApp</a><button class="ghost" data-act="cerrar">Listo</button>`);
     render(); window.scrollTo(0,0);
   }
   if(act==='cerrar'){ $('#modal').innerHTML=''; }
@@ -734,8 +743,11 @@ document.addEventListener('change',ev=>{
   if(el.dataset && el.dataset.band){ const plan = planNow(), it = plan.items.find(x=>x.id===el.dataset.band); exState(it.id,it.sets).band = el.value; save(); }
   if(el.dataset && el.dataset.f){ const plan = planNow(), it = plan.items.find(x=>x.id===el.dataset.id); exState(it.id,it.sets).sets[+el.dataset.k][el.dataset.f] = el.value.trim().replace(',','.'); save(); }
 });
+function fmtDur(ms){ const t = Math.max(0,Math.floor(ms/1000)), h = Math.floor(t/3600), m = Math.floor(t%3600/60), x = t%60; return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0'); }
+setInterval(()=>{ const el = document.getElementById('crono'); if(!el || !S.perfil) return; const a = P().actual; if(a && a.inicio) el.textContent = fmtDur(Date.now()-new Date(a.inicio).getTime()); },1000);
 function resumen(person,ses){
   const L = [`💪 ${PEOPLE[person].name} · ${ses.dia?'Día '+ses.dia:'Sesión '+(ses.n+1)} · semana ${Math.floor(ses.n/3)+1} · ${fmtDate(ses.fecha)}`];
+  if(ses.duracion) L.push(`⏱ Duración: ${ses.duracion} min`);
   if(ses.esfuerzo) L.push(`Esfuerzo: ${ses.esfuerzo}/10 (${RPE[ses.esfuerzo]})`);
   Object.entries(ses.ex||{}).forEach(([id,e])=>{
     if(!EX[id]) return;
