@@ -124,7 +124,8 @@ button.vid{cursor:pointer;font-family:inherit}
 
 .finish{margin-top:22px;display:grid;gap:8px}
 .crono-pill{position:sticky;top:8px;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;padding:8px 14px;border-radius:99px;background:var(--ink);color:var(--bg);box-shadow:0 4px 14px rgba(0,0,0,.18)}
-.crono-pill span{font-weight:700;font-size:.9rem}
+.crono-pill span{font-weight:700;font-size:.9rem;flex:1}
+.crono-x{border:0;background:rgba(127,127,127,.3);color:inherit;width:30px;height:30px;border-radius:50%;font-weight:800;cursor:pointer}
 .crono-pill b{font-family:var(--font-display);font-size:1.5rem;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .daypick{display:grid;gap:8px}
 .daypick button{display:grid;gap:2px;text-align:left;font:inherit;padding:10px 14px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
@@ -393,6 +394,8 @@ function P(id){ id = id||S.perfil; if(!S.personas[id]) S.personas[id] = {hechas:
 function current(){
   const p = P();
   if(!p.actual || p.actual.n !== p.hechas){ p.actual = {n:p.hechas,warm:{},ex:{},inicio:null}; save(); }
+  // Antes el cronómetro arrancaba solo al marcar una serie; ese tiempo no cuenta: ahora solo arranca con "Empezar".
+  if(p.actual.inicio && !p.actual.crono){ p.actual.inicio = null; save(); }
   return p.actual;
 }
 function exState(id,sets){
@@ -465,7 +468,7 @@ function renderHoy(){
   if(plan.total && p.hechas>=plan.total){
     html += `<div class="done-card"><h3>¡Terminaste las 12 semanas!</h3><p style="margin:0">Haz las pruebas en la pestaña Pruebas y avísale a José para preparar el siguiente plan. Mientras tanto, la app sigue con la etapa 3.</p></div>`;
   }
-  if(a.inicio) html += `<div class="crono-pill" role="timer" aria-live="off"><span>⏱ Entrenando</span><b id="crono">${fmtDur(Date.now()-new Date(a.inicio).getTime())}</b></div>`;
+  if(a.inicio) html += `<div class="crono-pill" role="timer" aria-live="off"><span>⏱ Entrenando</span><b id="crono">${fmtDur(Date.now()-new Date(a.inicio).getTime())}</b><button class="crono-x" data-act="parar-crono" aria-label="Detener el cronómetro">✕</button></div>`;
   html += `<section class="session">
     <span class="k">Semana ${plan.w}${plan.total?` de 12`:''} · ${senior?'':`sesión ${thisWeekDone+1} de 3`}</span>
     <h2>${sessionTitle}</h2>
@@ -662,7 +665,7 @@ document.addEventListener('click',ev=>{
   if(t.dataset.tick){
     const plan = planNow(), it = plan.items.find(x=>x.id===t.dataset.tick);
     const e = exState(it.id,it.sets), s = e.sets[+t.dataset.k];
-    s.ok = !s.ok; const a = current(); if(!a.inicio) a.inicio = new Date().toISOString();
+    s.ok = !s.ok;
     save(); keepAwake();
     const y = window.scrollY; render(); window.scrollTo(0,y);
     if(s.ok && !PEOPLE[S.perfil].senior) startRest(it.rest);
@@ -693,7 +696,8 @@ document.addEventListener('click',ev=>{
   if(t.id==='restSkip'){ stopRest(); return; }
   const act = t.dataset.act;
   if(act==='cambiar'){ S.perfil = null; save(); stopRest(); render(); window.scrollTo(0,0); }
-  if(act==='empezar'){ const a = current(); a.inicio = new Date().toISOString(); save(); keepAwake(); render(); window.scrollTo(0,0); }
+  if(act==='parar-crono'){ const a = current(); a.inicio = null; a.crono = false; save(); render(); window.scrollTo(0,0); }
+  if(act==='empezar'){ const a = current(); a.inicio = new Date().toISOString(); a.crono = true; save(); keepAwake(); render(); window.scrollTo(0,0); }
   if(act==='terminar'){
     const p = P(), a = current(), plan = planNow();
     const dur = a.inicio ? Math.max(1,Math.round((Date.now()-new Date(a.inicio).getTime())/60000)) : null;
