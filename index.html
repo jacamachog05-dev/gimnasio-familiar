@@ -353,7 +353,7 @@ const KEY = 'gimnasio-familiar-v1';
 let S = load();
 function blank(){ return {perfil:null,tab:'hoy',personas:{},pendientes:[]}; }
 // Panel del entrenador: cada sesión terminada se manda a la Hoja de Google de Luis.
-const COACH_URL = '';
+const COACH_URL = 'https://script.google.com/macros/s/AKfycbx7YdXrgVGplQxnySLJ6dwKp6qDWoKi6n3xvKqx1WfOwZsrV3mscS9HqB_Y0pve--hv/exec';
 function coachPayload(person,ses){
   const series = [];
   Object.entries(ses.ex||{}).forEach(([id,e])=>{ if(!EX[id]||e.skip) return; e.sets.forEach((x,k)=>{ if(x.ok) series.push({ejercicio:EX[id].n,serie:k+1,peso:x.peso,reps:x.reps,banda:e.band?bandName(e.band):''}); }); });
@@ -647,6 +647,11 @@ document.addEventListener('click',ev=>{
     P().pruebas.push(r); save(); render();
   }
   if(act==='ajustes') openSettings();
+  if(act==='probar-coach'){
+    t.textContent = 'Enviando…';
+    fetch(COACH_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({persona:'PRUEBA · '+PEOPLE[S.perfil].name,sesion:0,dia:'',semana:0,fecha:new Date().toISOString(),esfuerzo:'',hechos:0,saltados:'',resumen:'Prueba de conexión',series:[]})})
+      .then(()=>{ t.textContent = 'Enviado ✓ Revisa la hoja'; }).catch(()=>{ t.textContent = 'No se pudo enviar. ¿Hay internet?'; });
+  }
   if(act==='copiar'){
     const txt = $('#bk').value;
     navigator.clipboard?.writeText(txt).then(()=>{ t.textContent='Copiado'; }).catch(()=>{ $('#bk').select(); t.textContent='Selecciona y copia'; });
@@ -697,6 +702,7 @@ function openSettings(){
   <textarea id="rs" placeholder="Pega aquí el respaldo"></textarea>
   <p id="rsMsg" style="margin:0;color:var(--warn)"></p>
   <button class="ghost" data-act="restaurar">Restaurar</button>
+  <button class="ghost" data-act="probar-coach">Probar conexión con Luis</button>
   ${p.hechas>0?`<button class="ghost" data-act="atras-sesion">Deshacer la última sesión (${p.hechas})</button>`:''}
   <button class="big" data-act="cerrar">Cerrar</button>`);
 }
